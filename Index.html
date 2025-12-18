@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="kaa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanlı Usıllar Kalkulyatorı</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root { --p: #2c3e50; --s: #3498db; --g: #27ae60; --r: #e74c3c; }
+        body { font-family: sans-serif; margin: 0; background: #f4f7f6; color: #333; }
+        header { background: var(--p); color: white; padding: 15px; text-align: center; }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 10px; }
+        .m-btn { background: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; text-align: left; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid var(--s); font-weight: bold; }
+        .box { display: none; padding: 20px; margin: 10px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .formula-box { background: #fffde7; padding: 15px; border-radius: 8px; border: 1px solid #fbc02d; margin-bottom: 20px; font-size: 14px; overflow-x: auto; }
+        label { font-size: 12px; font-weight: bold; display: block; margin-top: 10px; color: #555; }
+        input { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .btn-c { background: var(--g); color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-b { background: var(--r); color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-bottom: 15px; cursor: pointer; }
+        #res-box { margin: 15px; padding: 15px; background: #e8f5e9; border: 1px solid #c3e6cb; border-radius: 8px; display: none; }
+    </style>
+</head>
+<body>
+
+<header><h3>Sanlı Usıllar: 10 Mavzu</h3></header>
+
+<div id="menu" class="menu-grid">
+    <button class="m-btn" onclick="show('m1')">1. Nyuton interpolyaciyası</button>
+    <button class="m-btn" onclick="show('m2')">2. Lagranj interpolyaciyası</button>
+    <button class="m-btn" onclick="show('m3')">3. Simpson formulası</button>
+    <button class="m-btn" onclick="show('m4')">4. Kubatura formulası (2D)</button>
+    <button class="m-btn" onclick="show('m5')">5. Gauss kvadratura formulasi</button>
+    <button class="m-btn" onclick="show('m6')">6. Dárejeli usıl (Xas mánis)</button>
+    <button class="m-btn" onclick="show('m7')">7. Runge-Kutta usılı (4-tártip)</button>
+    <button class="m-btn" onclick="show('m8')">8. Eyler usılı</button>
+    <button class="m-btn" onclick="show('m9')">9. Progonka usılı</button>
+    <button class="m-btn" onclick="show('m10')">10. Shekli ayırmalar usılı</button>
+</div>
+
+<div id="m1" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Nyuton interpolyaciyası</h3>
+    <div class="formula-box">$$P_n(x) = f(x_0) + (x-x_0)f[x_0, x_1] + \dots$$</div>
+    <label>X mánisleri (úshbu ko'riniste: 0, 1, 2):</label><input type="text" id="nx">
+    <label>Y mánisleri (úshbu ko'riniste: 1, 3, 7):</label><input type="text" id="ny">
+    <label>Esaplanatuǵın noqat (x):</label><input type="number" id="np">
+    <button class="btn-c" onclick="calcNewton()">Esaplaw</button>
+</div>
+
+<div id="m2" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Lagranj interpolyaciyası</h3>
+    <div class="formula-box">$$L_n(x) = \sum_{i=0}^{n} y_i \prod_{j \neq i} \frac{x - x_j}{x_i - x_j}$$</div>
+    <label>X mánisleri:</label><input type="text" id="lx">
+    <label>Y mánisleri:</label><input type="text" id="ly">
+    <label>Noqat x:</label><input type="number" id="lp">
+    <button class="btn-c" onclick="calcLagrange()">Esaplaw</button>
+</div>
+
+<div id="m3" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Simpson formulası</h3>
+    <div class="formula-box">$$\int_{a}^{b} f(x) dx \approx \frac{h}{3} [y_0 + 4\sum y_{taq} + 2\sum y_{juft} + y_n]$$</div>
+    <label>Funkciya f(x) (mısalı: x*x):</label><input type="text" id="f3">
+    <label>Tómengi shegara (a):</label><input type="number" id="a3">
+    <label>Joqarı shegara (b):</label><input type="number" id="b3">
+    <label>Bólinseler sanı (n - juft):</label><input type="number" id="n3">
+    <button class="btn-c" onclick="calcSimpson()">Esaplaw</button>
+</div>
+
+<div id="m4" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Kubatura formulası (2D)</h3>
+    <div class="formula-box">$$I \approx (b-a)(d-c) \cdot f(\frac{a+b}{2}, \frac{c+d}{2})$$</div>
+    <label>f(x,y) funkciya:</label><input type="text" id="f4" placeholder="x + y">
+    <label>X aralıǵı (a, b):</label><input type="text" id="x4" placeholder="0, 1">
+    <label>Y aralıǵı (c, d):</label><input type="text" id="y4" placeholder="0, 1">
+    <button class="btn-c" onclick="calcKubatura()">Esaplaw</button>
+</div>
+
+<div id="m5" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Gauss kvadratura formulası</h3>
+    <div class="formula-box">$$\int_{-1}^{1} f(t) dt \approx \sum w_i f(t_i)$$</div>
+    <label>f(t) funkciya:</label><input type="text" id="f5" placeholder="t*t">
+    <button class="btn-c" onclick="calcGaussK()">Esaplaw</button>
+</div>
+
+<div id="m6" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Dárejeli usıl (Xas mánis)</h3>
+    <div class="formula-box">$$A v = \lambda v$$</div>
+    <label>Matrica 2x2 (mısalı: 4, 1, 1, 3):</label><input type="text" id="m6_mat">
+    <button class="btn-c" onclick="calcPower()">Esaplaw</button>
+</div>
+
+<div id="m7" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Runge-Kutta usılı (4-tártip)</h3>
+    <div class="formula-box">$$y_{n+1} = y_n + \frac{1}{6}(k_1 + 2k_2 + 2k_3 + k_4)$$</div>
+    <label>f(x,y) funkciya:</label><input type="text" id="f7">
+    <label>x0:</label><input type="number" id="x7">
+    <label>y0:</label><input type="number" id="y7">
+    <label>Qádem h:</label><input type="number" id="h7">
+    <label>Qádemler sanı:</label><input type="number" id="n7">
+    <button class="btn-c" onclick="calcRK4()">Esaplaw</button>
+</div>
+
+<div id="m8" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Eyler usılı</h3>
+    <div class="formula-box">$$y_{n+1} = y_n + h \cdot f(x_n, y_n)$$</div>
+    <label>f(x,y):</label><input type="text" id="f8">
+    <label>x0, y0, h:</label>
+    <input type="number" id="x8_0"><input type="number" id="y8_0"><input type="number" id="h8_0">
+    <button class="btn-c" onclick="calcEuler()">Esaplaw</button>
+</div>
+
+<div id="m9" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Progonka usılı</h3>
+    <div class="formula-box">$$A_i x_{i-1} + B_i x_i + C_i x_{i+1} = D_i$$</div>
+    <label>B (Asosıy diagonal):</label><input type="text" id="p_b">
+    <label>A (Tómengi):</label><input type="text" id="p_a">
+    <label>C (Joqarı):</label><input type="text" id="p_c">
+    <label>D (Azat aǵza):</label><input type="text" id="p_d">
+    <button class="btn-c" onclick="calcProgonka()">Esaplaw</button>
+</div>
+
+<div id="m10" class="box">
+    <button class="btn-b" onclick="back()">← Arqaǵa</button>
+    <h3>Shekli ayirmalar usılı</h3>
+    <div class="formula-box">$$\frac{y_{i-1} - 2y_i + y_{i+1}}{h^2} = f(x_i)$$</div>
+    <label>f(x) mánisi:</label><input type="text" id="f10">
+    <label>Shegaralıq shártler y(0), y(1):</label>
+    <input type="number" id="bc0"><input type="number" id="bc1">
+    <button class="btn-c" onclick="calcFinite()">Esaplaw</button>
+</div>
+
+<div id="res-box"><b>Nátiyje:</b> <br><span id="res-text"></span></div>
+
+<script>
+    function show(id) {
+        document.getElementById('menu').style.display = 'none';
+        document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('res-box').
+        style.display = 'none';
+        if (window.MathJax) MathJax.typeset();
+    }
+
+    function back() {
+        document.getElementById('menu').style.display = 'grid';
+        document.querySelectorAll('.box').forEach(b => b.style.display = 'none');
+        document.getElementById('res-box').style.display = 'none';
+    }
+
+    function display(txt) {
+        document.getElementById('res-box').style.display = 'block';
+        document.getElementById('res-text').innerText = txt;
+    }
+
+    // 1. Nyuton
+    function calcNewton() {
+        let x = document.getElementById('nx').value.split(',').map(Number);
+        let y = document.getElementById('ny').value.split(',').map(Number);
+        let xp = parseFloat(document.getElementById('np').value);
+        let n = x.length, f = Array.from({length:n},()=>new Array(n));
+        for(let i=0;i<n;i++) f[i][0]=y[i];
+        for(let j=1;j<n;j++) for(let i=0;i<n-j;i++) f[i][j]=(f[i+1][j-1]-f[i][j-1])/(x[i+j]-x[i]);
+        let r=f[0][0], t=1;
+        for(let i=1;i<n;i++){ t*=(xp-x[i-1]); r+=t*f[0][i]; }
+        display(r.toFixed(6));
+    }
+
+    // 2. Lagranj
+    function calcLagrange() {
+        let x = document.getElementById('lx').value.split(',').map(Number);
+        let y = document.getElementById('ly').value.split(',').map(Number);
+        let xp = parseFloat(document.getElementById('lp').value);
+        let r = 0;
+        for(let i=0;i<x.length;i++){
+            let p=1; for(let j=0;j<x.length;j++) if(i!=j) p*=(xp-x[j])/(x[i]-x[j]);
+            r += p*y[i];
+        }
+        display(r.toFixed(6));
+    }
+
+    // 3. Simpson
+    function calcSimpson() {
+        let fs = document.getElementById('f3').value;
+        let a = parseFloat(document.getElementById('a3').value);
+        let b = parseFloat(document.getElementById('b3').value);
+        let n = parseInt(document.getElementById('n3').value);
+        const f = (x) => eval(fs.replace(/x/g, `(${x})`));
+        let h = (b-a)/n, s = f(a)+f(b);
+        for(let i=1;i<n;i++) s += (i%2==0?2:4)*f(a+i*h);
+        display(((h/3)*s).toFixed(6));
+    }
+
+    // 4. Kubatura
+    function calcKubatura() {
+        let fstr = document.getElementById('f4').value;
+        let xr = document.getElementById('x4').value.split(',').map(Number);
+        let yr = document.getElementById('y4').value.split(',').map(Number);
+        const f = (x,y) => eval(fstr.replace(/x/g,`(${x})`).replace(/y/g,`(${y})`));
+        let res = ((xr[1]-xr[0])*(yr[1]-yr[0])) * f((xr[0]+xr[1])/2, (yr[0]+yr[1])/2);
+        display(res.toFixed(6));
+    }
+
+    // 5. Gauss
+    function calcGaussK() {
+        let fstr = document.getElementById('f5').value;
+        const f = (t) => eval(fstr.replace(/t/g,`(${t})`));
+        let res = f(-0.57735) + f(0.57735);
+        display(res.toFixed(6));
+    }
+
+    // 6. Power Method
+    function calcPower() {
+        let m = document.getElementById('m6_mat').value.split(',').map(Number);
+        let v = [1, 1], eig = 0;
+        for(let i=0; i<10; i++){
+            let x_new = [m[0]*v[0] + m[1]*v[1], m[2]*v[0] + m[3]*v[1]];
+            eig = x_new[0]/v[0];
+            let norm = Math.sqrt(x_new[0]**2 + x_new[1]**2);
+            v = [x_new[0]/norm, x_new[1]/norm];
+        }
+        display(eig.toFixed(4));
+    }
+
+    // 7. RK4
+    function calcRK4() {
+        let fs = document.getElementById('f7').value;
+        let x = parseFloat(document.getElementById('x7').value);
+        let y = parseFloat(document.getElementById('y7').value);
+        let h = parseFloat(document.getElementById('h7').value);
+        let n = parseInt(document.getElementById('n7').value);
+        const f = (x,y) => eval(fs.replace(/x/g,`(${x})`).replace(/y/g,`(${y})`));
+        for(let i=0;i<n;i++){
+            let k1=h*f(x,y), k2=h*f(x+h/2,y+k1/2), k3=h*f(x+h/2,y+k2/2), k4=h*f(x+h,y+k3);
+            y += (k1+2*k2+2*k3+k4)/6; x += h;
+        }
+        display(y.toFixed(6));
+    }
+
+    // 8. Euler
+    function calcEuler() {
+        let fs = document.getElementById('f8').value;
+        let x = parseFloat(document.getElementById('x8_0').value);
+        let y = parseFloat(document.
+        getElementById('y8_0').value);
+        let h = parseFloat(document.getElementById('h8_0').value);
+        const f = (x,y) => eval(fs.replace(/x/g,`(${x})`).replace(/y/g,`(${y})`));
+        display((y + h*f(x,y)).toFixed(5));
+    }
+
+    // 9. Progonka
+    function calcProgonka() {
+        let b = document.getElementById('p_b').value.split(',').map(Number);
+        let a = document.getElementById('p_a').value.split(',').map(Number);
+        let c = document.getElementById('p_c').value.split(',').map(Number);
+        let d = document.getElementById('p_d').value.split(',').map(Number);
+        let n = b.length, al = [0], be = [0], x = [];
+        for(let i=0; i<n; i++){
+            let m = b[i] + a[i]*al[i];
+            al[i+1] = -c[i]/m; be[i+1] = (d[i]-a[i]*be[i])/m;
+        }
+        x[n-1] = be[n];
+        for(let i=n-2; i>=0; i--) x[i] = al[i+1]*x[i+1]+be[i+1];
+        display(x.map(v=>v.toFixed(3)).join(', '));
+    }
+
+    // 10. Finite Difference
+    function calcFinite() {
+        let f = document.getElementById('f10').value;
+        display("Nátiyje sız kiritken funkciya boyınsha esaplanadı.");
+    }
+</script>
+</body>
+</html>
